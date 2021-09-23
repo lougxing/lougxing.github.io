@@ -1,0 +1,29 @@
+add-highlighter global/ number-lines
+colorscheme solarized-dark
+
+hook global WinSetOption filetype=(c|cpp|cc) %{
+    clang-enable-autocomplete
+    clang-enable-diagnostics
+}
+
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/plug.kak" noload
+plug "andreyorst/fzf.kak"
+
+plug "danr/kakoune-easymotion"
+
+plug "andreyorst/powerline.kak" defer powerline %{
+    set-option global powerline_ignore_warnings true
+    set-option global powerline_format 'git bufname langmap smarttab mode_info filetype client session position'
+    set-option global powerline_separator '║'
+    set-option global powerline_separator_thin ''
+} defer powerline_bufname %{
+    set-option global powerline_shorten_bufname 'short'
+} defer powerline_solarized_dark %{
+    powerline-theme solarized-dark
+} config %{
+    powerline-start
+}
+
+map global normal <c-p> ': fzf-mode<ret>'
+set-option global ui_options terminal_enable_mouse=false
