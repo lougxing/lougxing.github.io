@@ -1,3 +1,4 @@
+
 add-highlighter global/ number-lines
 colorscheme solarized-dark
 
@@ -9,8 +10,23 @@ hook global WinSetOption filetype=(c|cpp|cc) %{
 source "%val{config}/plugins/plug.kak/rc/plug.kak"
 plug "andreyorst/plug.kak" noload
 plug "andreyorst/fzf.kak"
-
 plug "danr/kakoune-easymotion"
+
+plug "andreyorst/tagbar.kak" defer "tagbar" %{
+    set-option global tagbar_sort false
+    set-option global tagbar_size 49
+    set-option global tagbar_display_anon false
+} config %{
+    # if you have wrap highlighter enamled in you configuration
+    # files it's better to turn it off for tagbar, using this hook:
+    hook global WinSetOption filetype=tagbar %{
+        remove-highlighter window/wrap
+        # you can also disable rendering whitespaces here, line numbers, and
+        # matching characters
+    }
+}
+
+
 
 plug "andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_ignore_warnings true
@@ -18,12 +34,38 @@ plug "andreyorst/powerline.kak" defer powerline %{
     set-option global powerline_separator '║'
     set-option global powerline_separator_thin ''
 } defer powerline_bufname %{
-    set-option global powerline_shorten_bufname 'short'
+    set-option global powerline_shorten_bufname 'long'
 } defer powerline_solarized_dark %{
     powerline-theme solarized-dark
 } config %{
     powerline-start
 }
 
+
+plug "andreyorst/smarttab.kak" defer smarttab %{
+    # when `backspace' is pressed, 4 spaces are deleted at once
+    set-option global softtabstop 4
+} config %{
+    # these languages will use `expandtab' behavior
+    hook global WinSetOption filetype=(rust|markdown|kak|lisp|scheme|sh|perl|c|cc|cpp|h|hh|hpp|go|rs) expandtab
+    # these languages will use `noexpandtab' behavior
+    hook global WinSetOption filetype=(makefile|gas) noexpandtab
+    # these languages will use `smarttab' behavior
+    hook global WinSetOption filetype=(c|cpp) smarttab
+}
+
+
+plug "occivink/kakoune-vertical-selection"
+
+
+####################################################
+
 map global normal <c-p> ': fzf-mode<ret>'
 set-option global ui_options terminal_enable_mouse=false
+
+
+hook global WinSetOption filetype=(c|cc|cpp|h|hh|hpp|rust) %{
+    tagbar-enable
+}
+alias global 'q' 'tagbar-quit'
+alias global 'wq' 'tagbar-write-quit'
